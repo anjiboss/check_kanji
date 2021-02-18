@@ -29,9 +29,10 @@ checkBtn.click(() => {
     from = to;
     to = tmpNum;
     //expected Output: from -> to ; to -> from
+    errorOutput("");
     startTest(Number(from), Number(to));
   } else {
-    errorOutput();
+    errorOutput("");
     startTest(Number(from), Number(to));
   }
 });
@@ -60,8 +61,17 @@ const outAnswer = (curTestNum) => {
   }
 };
 
+//Check The Answer and Go To The Next Question
+//Scoring
 $(".answers").click(function () {
-  console.log($(this));
+  let ansId = $(this)[0].id;
+  if ($("#" + ansId).text() === words[curTestNum].hanViet) {
+    $("#" + ansId).css("background", "green");
+    setTimeout(function () {
+      $("#" + ansId).css("background", "rgb(160, 235, 240)");
+      outKanji(from, to);
+    }, 1000);
+  }
 });
 
 function randomInt(min, max) {
