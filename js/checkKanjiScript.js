@@ -7,6 +7,9 @@ const fromNum = $("#fromNum");
 const toNum = $("#toNum");
 
 let words;
+let curScore;
+let numberOfQuestion;
+let wrongAnswer;
 
 async function changeLevel(level) {
   if (level !== "Chọn cấp độ Kanji") {
@@ -19,6 +22,8 @@ async function changeLevel(level) {
 checkBtn.click(() => {
   from = fromNum.val();
   to = toNum.val();
+  curScore = 0;
+  wrongAnswer = [];
   //   validation
   if (from === "" || to === "") {
     errorOutput("Fill in all the fields please");
@@ -30,9 +35,13 @@ checkBtn.click(() => {
     to = tmpNum;
     //expected Output: from -> to ; to -> from
     errorOutput("");
+    numberOfQuestion = to - from + 1;
+    showScore(0);
     startTest(Number(from), Number(to));
   } else {
     errorOutput("");
+    numberOfQuestion = to - from + 1;
+    showScore(0);
     startTest(Number(from), Number(to));
   }
 });
@@ -48,10 +57,10 @@ const outKanji = (from, to) => {
   curTestNum = randomInt(from, to + 1);
   testHistory.push(curTestNum);
   $("#kanji").html(words[curTestNum].kanji);
-  outAnswer(curTestNum);
+  outAnswers(curTestNum);
 };
 
-const outAnswer = (curTestNum) => {
+const outAnswers = (curTestNum) => {
   let ans = randomInt(1, 5); // out 1 - 4
   $(`#answer-${ans}`).html(words[curTestNum].hanViet);
   for (let i = 1; i <= 4; i++) {
@@ -66,13 +75,26 @@ const outAnswer = (curTestNum) => {
 $(".answers").click(function () {
   let ansId = $(this)[0].id;
   if ($("#" + ansId).text() === words[curTestNum].hanViet) {
+    curScore++;
+    showScore(curScore);
     $("#" + ansId).css("background", "green");
     setTimeout(function () {
-      $("#" + ansId).css("background", "rgb(160, 235, 240)");
-      outKanji(from, to);
-    }, 1000);
+      $("#" + ansId).removeAttr("style");
+      outKanji(Number(from), Number(to));
+    }, 500);
+  } else {
+    $("#" + ansId).css("background", "red");
+    wrongAnswer.push(curTestNum);
+    setTimeout(function () {
+      $("#" + ansId).removeAttr("style");
+      outKanji(Number(from), Number(to));
+    }, 500);
   }
 });
+
+const showScore = (score) => {
+  $("#score").html(`${score}/${numberOfQuestion}`);
+};
 
 function randomInt(min, max) {
   min = Math.ceil(min);
